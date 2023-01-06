@@ -25,6 +25,7 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+// page to provide information about a single url
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
