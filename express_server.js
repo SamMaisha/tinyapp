@@ -51,6 +51,21 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 })
 
+// route to redirect user to the longURL site
+app.get("/u/:id", (req, res) => {
+  const shortURLID = req.params.id; 
+  const longURL = urlDatabase[shortURLID];
+
+  //end case: client requests short URL with a non-existant id
+  if (!shortURLID) {
+    return res.status(404).send("Error: URL not found. Please enter valid id")
+  }
+
+  // redirect client to site
+  res.redirect(longURL);
+  
+})
+
 
 
 app.get("/hello", (req, res) => {
