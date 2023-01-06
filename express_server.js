@@ -39,8 +39,9 @@ app.get("/urls/new", (req, res) => {
 
 // handle form input 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("ok");
+  const longURLToShorten = req.body.longURL;
+  const shortURLId = generateRandomString(); 
+  urlDatabase[shortURLId] = longURLToShorten;
 })
 
 // route to provide information about a single url
