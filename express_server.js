@@ -6,7 +6,12 @@ const PORT = 8080; // deault port 8080
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 
-// url data
+// functions
+function generateRandomString() { 
+  return Math.random().toString(36).slice(2);
+}
+
+// data
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -17,6 +22,7 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// route with list of urls
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
