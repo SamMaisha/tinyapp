@@ -2,6 +2,9 @@ const express = require("express"); // import express library
 const app = express(); // set up server using express
 const PORT = 8080; // deault port 8080
 
+// middleware
+app.set("view engine", "ejs");
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
