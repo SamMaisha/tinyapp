@@ -42,6 +42,7 @@ app.post("/urls", (req, res) => {
   const longURLToShorten = req.body.longURL;
   const shortURLId = generateRandomString(); 
   urlDatabase[shortURLId] = longURLToShorten;
+  res.redirect(`/urls/${shortURLId}`);
 })
 
 // route to provide information about a single url
