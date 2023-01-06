@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
 
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="" integrity="" crossorigin="" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
 
 
   <title>New URL - TinyApp Example</title>
@@ -17,7 +18,15 @@
   <%- include('partials/_header') %>
 
     <main style="margin: 1em;">
-
+      <h3>Create TinyURL</h3>
+      <form class="form-inline" action="/urls" method="POST">
+        <div class="form-group mb-2">
+          <label for="longURL">Enter a URL:</label>
+          <input class="form-control" type="text" name="longURL" placeholder="http://"
+            style="width: 300px; margin: 1em" />
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
     </main>
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
