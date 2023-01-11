@@ -10,10 +10,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 
-// functions
+// helper functions
 const generateRandomString = function() {
   return Math.random().toString(36).slice(2);
 };
+
 
 // DATA
 
@@ -56,6 +57,10 @@ app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const userEmail = req.body.email;
   const userPassword = req.body.password;
+
+  if (userEmail === "" || userPassword === "") {
+    return res.status(400).send(`${res.statusCode} error. Please enter valid username and password`)
+  }
 
   users[userID] = {
     id: userID,
