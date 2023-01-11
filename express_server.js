@@ -39,9 +39,9 @@ app.get("/urls/new", (req, res) => {
 
 // post route for new longURL to be shortened
 app.post("/urls", (req, res) => {
-  const longURLToShorten = req.body.longURL;
+  const longURLNew = req.body.longURL;
   const shortURLId = generateRandomString(); 
-  urlDatabase[shortURLId] = longURLToShorten;
+  urlDatabase[shortURLId] = longURLNew;
   res.redirect(`/urls/${shortURLId}`);
 })
 
@@ -49,6 +49,16 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
+})
+
+// post route to update text for a longURL
+app.post("/urls/:id", (req, res) => {
+  const shortURLID = req.params.id;
+  const longURLUpdate = req.body.longURL;
+  
+  urlDatabase[shortURLID] = longURLUpdate;
+
+  res.redirect("/urls");
 })
 
 // post route to remove a deleted URL
