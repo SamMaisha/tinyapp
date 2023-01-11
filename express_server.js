@@ -37,7 +37,7 @@ app.post("/login", (req, res) => {
 
 // route with list of urls
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
 })
 
@@ -46,8 +46,10 @@ app.get("/urls.json", (req, res) => {
 });
 
 // route to submit longURL to be shortened
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+app.get("/urls/new", (req, res) =>
+{
+  const templateVars = {username: req.cookies["username"]}
+  res.render("urls_new", templateVars);
 })
 
 // post route for client to submit new longURL to be shortened
@@ -60,7 +62,7 @@ app.post("/urls", (req, res) => {
 
 // route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 })
 
