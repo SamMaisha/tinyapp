@@ -49,6 +49,20 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
+// POST route for registration
+app.post("/register", (req, res) => {
+  const userID = generateRandomString();
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
+
+  users[userID] = {
+    id: userID,
+    email: userEmail,
+    password: userPassword
+  }
+
+})
+
 // POST route for login
 app.post("/login", (req, res) => {
   const username = req.body.username;
@@ -66,7 +80,10 @@ app.post("/logout", (req, res) => {
 
 // route with list of urls
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const templateVars = { 
+    urls: urlDatabase, 
+    username: req.cookies["username"] 
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -76,7 +93,10 @@ app.get("/urls.json", (req, res) => {
 
 // route to submit longURL to be shortened
 app.get("/urls/new", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  
   res.render("urls_new", templateVars);
 });
 
@@ -85,12 +105,18 @@ app.post("/urls", (req, res) => {
   const longURLNew = req.body.longURL;
   const shortURLId = generateRandomString();
   urlDatabase[shortURLId] = longURLNew;
+
   res.redirect(`/urls/${shortURLId}`);
 });
 
 // route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
+  const templateVars = { 
+    id: req.params.id, 
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"] 
+  };
+
   res.render("urls_show", templateVars);
 });
 
