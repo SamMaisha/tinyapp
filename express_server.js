@@ -1,10 +1,14 @@
 const express = require("express"); // import express library
+const cookieParser = require('cookie-parser'); // import cookie parser
+
 const app = express(); // set up server using express
 const PORT = 8080; // deault port 8080
 
 // middleware
-app.set("view engine", "ejs");
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
+app.set("view engine", "ejs");
 
 // functions
 function generateRandomString() { 
@@ -22,6 +26,15 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// POST route for client to login
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie('username', username);
+
+  res.redirect("/urls")
+})
+
+
 // route with list of urls
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
@@ -37,7 +50,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 })
 
-// post route for new longURL to be shortened
+// post route for client to submit new longURL to be shortened
 app.post("/urls", (req, res) => {
   const longURLNew = req.body.longURL;
   const shortURLId = generateRandomString(); 
