@@ -89,6 +89,11 @@ app.post("/register", (req, res) => {
   res.redirect ("/urls");
 });
 
+// route for login page
+app.get("/login", (res, render) => {
+  res.render("login");
+});
+
 // POST route for login
 app.post("/login", (req, res) => {
   const username = req.body.username;
