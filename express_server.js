@@ -26,6 +26,11 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// route for registration page
+app.get("/register", (req, res) => {
+  res.render("register");
+})
+
 // POST route for login
 app.post("/login", (req, res) => {
   const username = req.body.username;
