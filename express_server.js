@@ -10,19 +10,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 
-// helper functions
-const generateRandomString = function() {
-  return Math.random().toString(36).slice(2);
-};
-
-const getUserByEmail = function(email) {
-  for (const userID in users) {
-    if ( userID.email === email ) {
-      return users[userID];
-    }
-  }
-  return null;
-};
 
 // DATA
 
@@ -45,6 +32,20 @@ const users = {
     email: "alex@gmail.com",
     password: "321"
   }
+};
+
+// helper functions
+const generateRandomString = function() {
+  return Math.random().toString(36).slice(2);
+};
+
+const getUserByEmail = function(email) {
+  for (const userID in users) {
+    if ( users[userID].email === email ) {
+      return users[userID];
+    }
+  }
+  return null;
 };
 
 
@@ -70,12 +71,20 @@ app.post("/register", (req, res) => {
     return res.status(400).send(`${res.statusCode} error. Please enter valid username and password`)
   }
 
+  //check to see if user with email already exists
+  const foundUser = getUserByEmail(userEmail);
+
+  if (foundUser) { 
+     return res.status(400).send(`${res.statusCode} error. User with email ${userEmail} already exists`);
+  }
+
+  // id user with email does not exist, add user to users object
   users[userID] = {
     id: userID,
     email: userEmail,
     password: userPassword
   };
-
+  
   res.cookie('user_id', userID);
   res.redirect ("/urls");
 });
