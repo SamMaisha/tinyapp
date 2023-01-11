@@ -15,11 +15,29 @@ function generateRandomString() {
   return Math.random().toString(36).slice(2);
 }
 
-// data
+// url and user data
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const users = {
+
+  "h67f5h": {
+    id: "h67f5h",
+    email: "jade@gmail.com",
+    password: "123"
+  },
+
+  "3g6j0s": {
+    id: "3g6j0s",
+    email: "alex@gmail.com",
+    password: "321"
+  }
+};
+
+
+////////////// ROUTES /////////////////////
 
 // home page
 app.get("/", (req, res) => {
