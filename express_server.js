@@ -83,11 +83,10 @@ app.post("/logout", (req, res) => {
 
 // route with list of urls
 app.get("/urls", (req, res) => {
-  const userID = req.cookies["user_id"];
 
   const templateVars = {
     urls: urlDatabase,
-    user: users[userID]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_index", templateVars);
 });
@@ -98,10 +97,9 @@ app.get("/urls.json", (req, res) => {
 
 // route to submit longURL to be shortened
 app.get("/urls/new", (req, res) => {
-  const userID = req.cookies["user_id"];
 
   const templateVars = {
-    user: users[userID]
+    user: users[req.cookies["user_id"]]
   };
   
   res.render("urls_new", templateVars);
@@ -118,13 +116,11 @@ app.post("/urls", (req, res) => {
 
 // route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
-
-  const userID = req.cookies["user_id"]; 
  
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    user: users[userID]
+    user: users[req.cookies["user_id"]]
   };
 
   res.render("urls_show", templateVars);
