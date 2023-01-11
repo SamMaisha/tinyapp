@@ -90,7 +90,7 @@ app.post("/register", (req, res) => {
 });
 
 // route for login page
-app.get("/login", (res, render) => {
+app.get("/login", (req, res) => {
   res.render("login");
 });
 
