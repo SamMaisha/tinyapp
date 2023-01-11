@@ -11,9 +11,9 @@ app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 // functions
-function generateRandomString() { 
+const generateRandomString = function() {
   return Math.random().toString(36).slice(2);
-}
+};
 
 // url and user data
 const urlDatabase = {
@@ -47,53 +47,52 @@ app.get("/", (req, res) => {
 // route for registration page
 app.get("/register", (req, res) => {
   res.render("register");
-})
+});
 
 // POST route for login
 app.post("/login", (req, res) => {
   const username = req.body.username;
   res.cookie('username', username);
 
-  res.redirect("/urls")
-})
+  res.redirect("/urls");
+});
 
 // POST route for logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('username'); 
+  res.clearCookie('username');
 
   res.redirect("/urls");
-})
+});
 
 // route with list of urls
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
-})
+});
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
 // route to submit longURL to be shortened
-app.get("/urls/new", (req, res) =>
-{
-  const templateVars = {username: req.cookies["username"]}
+app.get("/urls/new", (req, res) => {
+  const templateVars = {username: req.cookies["username"]};
   res.render("urls_new", templateVars);
-})
+});
 
 // post route for client to submit new longURL to be shortened
 app.post("/urls", (req, res) => {
   const longURLNew = req.body.longURL;
-  const shortURLId = generateRandomString(); 
+  const shortURLId = generateRandomString();
   urlDatabase[shortURLId] = longURLNew;
   res.redirect(`/urls/${shortURLId}`);
-})
+});
 
 // route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
   res.render("urls_show", templateVars);
-})
+});
 
 // post route to update text for a longURL
 app.post("/urls/:id", (req, res) => {
@@ -103,7 +102,7 @@ app.post("/urls/:id", (req, res) => {
   urlDatabase[shortURLID] = longURLUpdate;
 
   res.redirect("/urls");
-})
+});
 
 // post route to remove a deleted URL
 app.post("/urls/:id/delete", (req, res) => {
@@ -111,23 +110,21 @@ app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[shortURLId];
 
   res.redirect("/urls");
-
-})
+});
 
 // route to redirect user to the longURL site
 app.get("/u/:id", (req, res) => {
-  const shortURLID = req.params.id; 
+  const shortURLID = req.params.id;
   const longURL = urlDatabase[shortURLID];
 
   //edge case: client requests short URL with a non-existant id
   if (!longURL) {
-    return res.status(404).send("Error: URL not found. Please enter valid id")
+    return res.status(404).send("Error: URL not found. Please enter valid id");
   }
 
   // redirect client to site
   res.redirect(longURL);
-  
-})
+});
 
 
 
