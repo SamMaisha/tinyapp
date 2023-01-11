@@ -15,6 +15,14 @@ const generateRandomString = function() {
   return Math.random().toString(36).slice(2);
 };
 
+const getUserByEmail = function(email) {
+  for (const userID in users) {
+    if ( userID.email === email ) {
+      return users[userID];
+    }
+  }
+  return null;
+};
 
 // DATA
 
