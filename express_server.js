@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-// POST route for client to login
+// POST route for login
 app.post("/login", (req, res) => {
   const username = req.body.username;
   res.cookie('username', username);
@@ -34,6 +34,12 @@ app.post("/login", (req, res) => {
   res.redirect("/urls")
 })
 
+// POST route for logout
+app.post("/logout", (req, res) => {
+  res.clearCookie('username'); 
+
+  res.redirect("/urls");
+})
 
 // route with list of urls
 app.get("/urls", (req, res) => {
