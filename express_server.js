@@ -15,14 +15,16 @@ const generateRandomString = function() {
   return Math.random().toString(36).slice(2);
 };
 
-// url and user data
+// DATA
+
+// urls
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
+// users
 const users = {
-
   "h67f5h": {
     id: "h67f5h",
     email: "jade@gmail.com",
@@ -81,9 +83,11 @@ app.post("/logout", (req, res) => {
 
 // route with list of urls
 app.get("/urls", (req, res) => {
+  const userID = req.cookies["user_id"];
+
   const templateVars = {
     urls: urlDatabase,
-    user: users
+    user: users[userID]
   };
   res.render("urls_index", templateVars);
 });
@@ -94,8 +98,10 @@ app.get("/urls.json", (req, res) => {
 
 // route to submit longURL to be shortened
 app.get("/urls/new", (req, res) => {
+  const userID = req.cookies["user_id"];
+
   const templateVars = {
-    user: users
+    user: users[userID]
   };
   
   res.render("urls_new", templateVars);
@@ -112,10 +118,13 @@ app.post("/urls", (req, res) => {
 
 // route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
+
+  const userID = req.cookies["user_id"]; 
+ 
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    user: users
+    user: users[userID]
   };
 
   res.render("urls_show", templateVars);
