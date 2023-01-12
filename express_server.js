@@ -113,8 +113,14 @@ app.post("/login", (req, res) => {
   const userPassword = req.body.password;
   const userFound = getUserByEmail(userEmail);
 
+  // if user's email does not exist in users object, send 403 status code
   if (!userFound) {
     return res.status(403).send(`${res.statusCode} error. User with email ${userEmail} cannot be found.`)
+  }
+
+  // if user's password does not match password in users object, send 403 status code
+  if (userPassword !== userFound.password) {
+    return res.status(403).send(`${res.statusCode} error. The password entered is incorrect.`)
   }
 
   const userID = userFound.id
