@@ -55,12 +55,19 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-// route for registration page
+/**
+ * Registration Page
+ */
+
+// GET route 
 app.get("/register", (req, res) => {
-  res.render("register");
+  const templateVars = {
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("register", templateVars);
 });
 
-// POST route for registration
+// POST route 
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const userEmail = req.body.email;
@@ -88,15 +95,24 @@ app.post("/register", (req, res) => {
   res.redirect ("/urls");
 });
 
-// route for login page
+/**
+ * Login Page
+ */
+
+// GET route 
 app.get("/login", (req, res) => {
-  res.render("login");
+  const templateVars = {
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("login", templateVars);
 });
 
-// POST route for login
+// POST route 
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
+  const userID = getUserByEmail(userEmail).id;
+  res.cookie('user_id', userID);
   res.redirect("/urls");
 });
 
