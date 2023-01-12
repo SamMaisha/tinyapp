@@ -70,9 +70,9 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]]
   };
-
-  // check if user is logged in. If they are, redirect to /urls 
-  if (req.cookies["user_id"]) {
+  
+   // check if user is logged in. If they are, redirect to /urls 
+   if (req.cookies["user_id"]) {
     res.redirect("/urls");
   }
 
@@ -191,17 +191,24 @@ app.get("/urls/new", (req, res) => {
   if (!req.cookies["user_id"]) {
     res.redirect("/login");
   }
-  
+  // if user is logged in, they can access /urls/new page
   res.render("urls_new", templateVars);
 });
 
 // POST route
 app.post("/urls", (req, res) => {
+
+  // if user is not logged in, they cannot create shortURL
+  if (!req.cookies["user_id"]) {
+    res.status(401).send(`${res.statusCode} error. Please login to submit URL`);
+  } else {
   const longURLNew = req.body.longURL;
   const shortURLId = generateRandomString();
   urlDatabase[shortURLId] = longURLNew;
 
   res.redirect(`/urls/${shortURLId}`);
+  }
+  console.log(urlDatabase);  
 });
 
 
