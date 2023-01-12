@@ -70,6 +70,14 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]]
   };
+
+  // check if user is logged in. If they are, redirect to /urls 
+  const userID = req.cookies["user_id"] 
+  if (userID) {
+    res.redirect("/urls");
+  }
+
+  // if user is not logged in, they can access registration page
   res.render("register", templateVars);
 });
 
@@ -118,7 +126,7 @@ app.get("/login", (req, res) => {
     res.redirect("/urls");
   }
 
-  // if user is not logged in, they are directed to login page
+  // if user is not logged in, they can access login page
   res.render("login", templateVars);
 });
 
