@@ -5,10 +5,10 @@ const app = express(); // set up server using express
 const PORT = 8080; // deault port 8080
 
 // middleware
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // parse cookie data
+app.use(express.urlencoded({ extended: true })); // parse request body
 
-app.set("view engine", "ejs");
+app.set("view engine", "ejs"); 
 
 
 // DATA
@@ -48,12 +48,18 @@ const getUserByEmail = function(email) {
 };
 
 
-////////////// ROUTES /////////////////////
+////////////////////////////////////////////////////////// 
+                   //ROUTES// 
+/////////////////////////////////////////////////////////
 
-// home page
+/**
+ * home page
+ */
+
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
+
 
 /**
  * Registration Page
@@ -74,7 +80,7 @@ app.post("/register", (req, res) => {
   const userPassword = req.body.password;
 
   if (!userEmail || !userPassword) {
-    return res.status(400).send(`${res.statusCode} error. Please enter valid username and password`)
+    return res.status(400).send(`${res.statusCode} error. Please enter valid email and password`)
   }
 
   //check to see if user with email already exists
@@ -84,7 +90,7 @@ app.post("/register", (req, res) => {
      return res.status(400).send(`${res.statusCode} error. User with email ${userEmail} already exists`);
   }
 
-  // id user with email does not exist, add user to users object
+  // if user with email does not exist, add user to users object
   users[userID] = {
     id: userID,
     email: userEmail,
@@ -94,6 +100,7 @@ app.post("/register", (req, res) => {
   res.cookie('user_id', userID);
   res.redirect ("/urls");
 });
+
 
 /**
  * Login Page
@@ -128,14 +135,24 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-// POST route for logout
+
+/**
+ * Logout Process
+ */
+
+// POST route
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
 
   res.redirect("/login");
 });
 
-// route with list of urls
+
+/**
+ * Page showing list of Urls
+ */
+
+// GET route
 app.get("/urls", (req, res) => {
 
   const templateVars = {
@@ -145,11 +162,12 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
 
-// route to submit longURL to be shortened
+/**
+ * Page to submit long URLs to be shortened
+ */
+
+// GET route
 app.get("/urls/new", (req, res) => {
 
   const templateVars = {
@@ -159,7 +177,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-// post route for client to submit new longURL to be shortened
+// POST route
 app.post("/urls", (req, res) => {
   const longURLNew = req.body.longURL;
   const shortURLId = generateRandomString();
@@ -168,7 +186,16 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURLId}`);
 });
 
-// route to provide information about a single url
+
+/** 
+ * Additional Pages
+ */
+
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+
+// GET route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
  
   const templateVars = {
@@ -180,7 +207,7 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// post route to update text for a longURL
+// POST route to update text for a longURL
 app.post("/urls/:id", (req, res) => {
   const shortURLID = req.params.id;
   const longURLUpdate = req.body.longURL;
@@ -190,7 +217,7 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-// post route to remove a deleted URL
+// POST route to remove a deleted URL
 app.post("/urls/:id/delete", (req, res) => {
   const shortURLId = req.params.id;
   delete urlDatabase[shortURLId];
@@ -198,7 +225,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-// route to redirect user to the longURL site
+// GET route to redirect user to the longURL site
 app.get("/u/:id", (req, res) => {
   const shortURLID = req.params.id;
   const longURL = urlDatabase[shortURLID];
@@ -211,8 +238,6 @@ app.get("/u/:id", (req, res) => {
   // redirect client to site
   res.redirect(longURL);
 });
-
-
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
