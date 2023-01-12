@@ -73,7 +73,7 @@ app.post("/register", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
 
-  if (userEmail === "" || userPassword === "") {
+  if (!userEmail || !userPassword) {
     return res.status(400).send(`${res.statusCode} error. Please enter valid username and password`)
   }
 
@@ -111,7 +111,13 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
-  const userID = getUserByEmail(userEmail).id;
+  const userFound = getUserByEmail(userEmail);
+
+  if (!userFound) {
+    return res.status(403).send(`${res.statusCode} error. User with email ${userEmail} cannot be found.`)
+  }
+
+  const userID = userFound.id
   res.cookie('user_id', userID);
   res.redirect("/urls");
 });
