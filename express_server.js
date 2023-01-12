@@ -72,8 +72,7 @@ app.get("/register", (req, res) => {
   };
 
   // check if user is logged in. If they are, redirect to /urls 
-  const userID = req.cookies["user_id"] 
-  if (userID) {
+  if (req.cookies["user_id"]) {
     res.redirect("/urls");
   }
 
@@ -121,8 +120,7 @@ app.get("/login", (req, res) => {
   };
   
   // check if user is logged in. If they are, redirect to /urls 
-  const userID = req.cookies["user_id"] 
-  if (userID) {
+  if (req.cookies["user_id"] ) {
     res.redirect("/urls");
   }
 
@@ -185,10 +183,14 @@ app.get("/urls", (req, res) => {
 
 // GET route
 app.get("/urls/new", (req, res) => {
-
   const templateVars = {
     user: users[req.cookies["user_id"]]
   };
+
+  // if user is not logged in, redirect to /login
+  if (!req.cookies["user_id"]) {
+    res.redirect("/login");
+  }
   
   res.render("urls_new", templateVars);
 });
