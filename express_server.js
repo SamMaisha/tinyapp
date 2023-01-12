@@ -12,7 +12,6 @@ app.set("view engine", "ejs");
 
 
 // DATA
-
 // urls
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -87,6 +86,11 @@ app.post("/register", (req, res) => {
   
   res.cookie('user_id', userID);
   res.redirect ("/urls");
+});
+
+// route for login page
+app.get("/login", (req, res) => {
+  res.render("login");
 });
 
 // POST route for login
