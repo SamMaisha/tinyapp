@@ -18,6 +18,7 @@
     <title>Login</title>
   </head>
   <body>
+    <%- include('partials/_header') %>
     <main style="margin: 1em">
       <h3>Login</h3>
       <form action="/login" method="POST">
@@ -27,7 +28,7 @@
             class="form-control"
             type="email"
             name="email"
-            placeholder="example@email.com"
+            placeholder="Enter email"
             style="width: 300px; margin: 1em"
           />
           <label for="password">Password</label>
@@ -35,6 +36,7 @@
             class="form-control"
             type="password"
             name="password"
+            placeholder="Password"
             style="width: 300px; margin: 1em"
           />
           <button type="submit" class="btn btn-primary">Login</button>
