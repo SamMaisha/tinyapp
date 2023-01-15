@@ -190,8 +190,12 @@ app.get("/urls", (req, res) => {
     res.status(401).send(`${res.statusCode} error. Cannot access resource. Please register or login`); 
   }
 
+  // user can only see urls they created
+  const userID = users[req.cookies["user_id"]].id
+  const urlsUserCanAccess = geturlsForUserID(userID);
+
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsUserCanAccess,
     user: users[req.cookies["user_id"]]
   };
 
