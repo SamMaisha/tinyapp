@@ -54,14 +54,16 @@ const getUserByEmail = function(email) {
 };
 
 const geturlsForUserID = function(userID) {
-  const urlIDArray = []; // empty array to take in list of short url IDs
+  const urlObj = {}; // empty object to take in list of short url IDs and longURLs
 
   for (const urlID in urlDatabase) {
     if (urlDatabase[urlID].userID === userID) {
-      urlIDArray.push(urlID);
+      urlObj[urlID] = {
+        longURL: urlDatabase[urlID].longURL,
+      }
     } 
-  }
-  return urlIDArray;
+  } 
+  return urlObj; 
 }
 
 
@@ -191,7 +193,7 @@ app.get("/urls", (req, res) => {
   }
 
   // user can only see urls they created
-  const userID = users[req.cookies["user_id"]].id
+  const userID = req.cookies["user_id"]
   const urlsUserCanAccess = geturlsForUserID(userID);
 
   const templateVars = {
@@ -230,8 +232,11 @@ app.post("/urls", (req, res) => {
   } else {
   const longURLNew = req.body.longURL;
   const shortURLId = generateRandomString();
+  const userID = req.cookies["user_id"]
+  
   urlDatabase[shortURLId] = {
     longURL: longURLNew,
+    userID
     }
   console.log(urlDatabase);
     
