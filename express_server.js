@@ -261,13 +261,23 @@ app.get("/urls/:id", (req, res) => {
     res.status(401).send(`${res.statusCode} error. Please login or register to access this resource`);
   } 
 
-  const templateVars = {
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
-    user: users[req.cookies["user_id"]]
-  };
+  // users can only access urls they created
+  const userID = req.cookies["user_id"];
+  const urlsUserCanAccess = geturlsForUserID(userID);
+  const shortURLID = req.params.id;
+  
  
-  res.render("urls_show", templateVars);
+  if (!(shortURLID in urlsUserCanAccess)) {
+    res.status(403).send(`${res.statusCode} error. You are not authorized to access this resource`);
+  } else {
+    const templateVars = {
+      id: userID,
+      longURL: urlsUserCanAccess[shortURLID].longURL,
+      user: users[userID]
+    };
+
+    res.render("urls_show", templateVars);
+  }
 });
 
 // POST route to update text for a longURL
