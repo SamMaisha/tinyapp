@@ -290,11 +290,19 @@ app.post("/urls/:id", (req, res) => {
     res.status(404).send(`${res.statusCode} error.The url you are trying to update does not exist`);
   }
 
-  urlDatabase[shortURLID] = {
-    longURL: longURLUpdate,
-  }
+  // send error message if the user is not logged in
+  if (!req.cookies["user_id"]) {
+    res.status(401).send(`${res.statusCode} error. Please login or register to update this resource`);
+  } else {
+    urlDatabase[shortURLID] = {
+      longURL: longURLUpdate,
+    }
+  
+    res.redirect("/urls");
+  } 
 
-  res.redirect("/urls");
+console.log(urlDatabase);
+  
 });
 
 // POST route to remove a deleted URL
@@ -305,6 +313,11 @@ app.post("/urls/:id/delete", (req, res) => {
   if (!(shortURLID in urlDatabase)) {
     res.status(404).send(`${res.statusCode} error.The url you are trying to delete does not exist`);
   }
+
+  // send error message if the user is not logged in
+  if (!req.cookies["user_id"]) {
+    res.status(401).send(`${res.statusCode} error. Please login or register to delete this resource`);
+  } 
 
   delete urlDatabase[shortURLId];
 
