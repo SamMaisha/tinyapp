@@ -14,14 +14,20 @@ app.set("view engine", "ejs");
 // DATA
 // urls
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "h67f5h"
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+    userID: "h67f5h"
+  }, 
 };
 
 // users
 const users = {
   "h67f5h": {
-    id: "h67f5h",
+    id: h67f5h,
     email: "jade@gmail.com",
     password: "123"
   },
@@ -30,7 +36,7 @@ const users = {
     id: "3g6j0s",
     email: "alex@gmail.com",
     password: "321"
-  }
+  },
 };
 
 // helper functions
@@ -257,7 +263,7 @@ app.get("/u/:id", (req, res) => {
 
   //user requests short URL with a non-existant id
   if (!longURL) {
-    return res.status(404).send("Error: URL not found. Please enter valid id");
+    return res.status(404).send(`${res.statusCode} error URL not found. Please enter valid URL id`);
   }
 
   // redirect client to site
