@@ -189,7 +189,7 @@ app.post("/logout", (req, res) => {
 app.get("/urls", (req, res) => {
    // user cannot access /urls if not logged in
   if (!req.cookies["user_id"]) {
-    res.status(401).send(`${res.statusCode} error. Cannot access resource. Please register or login`); 
+    res.status(401).send(`${res.statusCode} error. Please login or register to access this resource`); 
   }
 
   // user can only see urls they created
@@ -256,13 +256,17 @@ app.get("/urls.json", (req, res) => {
 
 // GET route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
- 
+  // if user is not logged in, they cannot access /urls/:id 
+  if (!req.cookies["user_id"]) {
+    res.status(401).send(`${res.statusCode} error. Please login or register to access this resource`);
+  } 
+
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
     user: users[req.cookies["user_id"]]
   };
-
+ 
   res.render("urls_show", templateVars);
 });
 
