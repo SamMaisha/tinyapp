@@ -271,7 +271,7 @@ app.get("/urls/:id", (req, res) => {
     res.status(403).send(`${res.statusCode} error. You are not authorized to access this resource`);
   } else {
     const templateVars = {
-      id: userID,
+      id: shortURLID,
       longURL: urlsUserCanAccess[shortURLID].longURL,
       user: users[userID]
     };
@@ -284,6 +284,8 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const shortURLID = req.params.id;
   const longURLUpdate = req.body.longURL;
+  const userID = req.cookies["user_id"];
+  const urlsUserCanAccess = geturlsForUserID(userID);
 
   // send error message if the shortUrlID does not exist
   if (!(shortURLID in urlDatabase)) {
@@ -291,23 +293,27 @@ app.post("/urls/:id", (req, res) => {
   }
 
   // send error message if the user is not logged in
-  if (!req.cookies["user_id"]) {
+  if (!userID) {
     res.status(401).send(`${res.statusCode} error. Please login or register to update this resource`);
+  } 
+  
+  // user cannot update urls they did not create
+  if (!(shortURLID in urlsUserCanAccess)) {
+    res.status(403).send(`${res.statusCode} error. Insufficient permission to update this resource`)
   } else {
     urlDatabase[shortURLID] = {
       longURL: longURLUpdate,
     }
-  
     res.redirect("/urls");
   } 
-
-console.log(urlDatabase);
   
 });
 
 // POST route to remove a deleted URL
 app.post("/urls/:id/delete", (req, res) => {
   const shortURLID = req.params.id;
+  const userID = req.cookies["user_id"];
+  const urlsUserCanAccess = geturlsForUserID(userID);
 
   // send error message if the shortUrlID does not exist
   if (!(shortURLID in urlDatabase)) {
@@ -315,16 +321,18 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 
   // send error message if the user is not logged in
-  if (!req.cookies["user_id"]) {
+  if (!userID) {
     res.status(401).send(`${res.statusCode} error. Please login or register to delete this resource`);
+  } 
+  
+  // user cannot delete urls they did not create
+  if (!(shortURLID in urlsUserCanAccess)) {
+    res.status(403).send(`${res.statusCode} error. Insufficient permission to delete this resource`)
   } else {
     delete urlDatabase[shortURLId];
 
     res.redirect("/urls");
-
   }
-
-console.log(urlDatabase);
 });
 
 // GET route to redirect user to the longURL site
