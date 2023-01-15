@@ -246,7 +246,9 @@ app.post("/urls/:id", (req, res) => {
   const shortURLID = req.params.id;
   const longURLUpdate = req.body.longURL;
   
-  urlDatabase[shortURLID] = longURLUpdate;
+  urlDatabase[shortURLID] = {
+    longURL: longURLUpdate,
+  }
 
   res.redirect("/urls");
 });
