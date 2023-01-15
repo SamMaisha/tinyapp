@@ -284,7 +284,12 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const shortURLID = req.params.id;
   const longURLUpdate = req.body.longURL;
-  
+
+  // send error message if the shortUrlID does not exist
+  if (!(shortURLID in urlDatabase)) {
+    res.status(404).send(`${res.statusCode} error.The url you are trying to update does not exist`)
+  }
+
   urlDatabase[shortURLID] = {
     longURL: longURLUpdate,
   }
