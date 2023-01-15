@@ -264,7 +264,7 @@ app.post("/urls/:id/delete", (req, res) => {
 // GET route to redirect user to the longURL site
 app.get("/u/:id", (req, res) => {
   const shortURLID = req.params.id;
-  const longURL = urlDatabase[shortURLID];
+  const longURL = urlDatabase[shortURLID].longURL;
 
   //user requests short URL with a non-existant id
   if (!longURL) {
