@@ -114,7 +114,6 @@ app.post("/register", (req, res) => {
   }
 
   //send message if user with the email entered already exists
-
   if (foundUser) { 
      return res.status(400).send(`${res.statusCode} error. User with email ${userEmail} already exists`);
   }
@@ -155,7 +154,6 @@ app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const userFound = getUserByEmail(userEmail);
-  const userID = userFound.id;
 
   // if user's email does not exist in users object, send 403 status code
   if (!userFound) {
@@ -168,6 +166,7 @@ app.post("/login", (req, res) => {
   }
 
   // if email and password are correct, save cookie to browser and redirect to /urls page
+  const userID = userFound.id;
   res.cookie('user_id', userID);
   res.redirect("/urls");
 });
@@ -244,8 +243,6 @@ app.post("/urls", (req, res) => {
     longURL: longURLNew,
     userID
     }
-  console.log(urlDatabase);
-    
   res.redirect(`/urls/${shortURLId}`);
   }
 });
@@ -261,17 +258,16 @@ app.get("/urls.json", (req, res) => {
 
 // GET route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
+  const userID = req.cookies["user_id"];
+  const urlsUserCanAccess = geturlsForUserID(userID);
+  const shortURLID = req.params.id;
+
   // if user is not logged in, they cannot access /urls/:id 
-  if (!req.cookies["user_id"]) {
+  if (!userID) {
     res.status(401).send(`${res.statusCode} error. Please login or register to access this resource`);
   } 
 
   // users can only access urls they created
-  const userID = req.cookies["user_id"];
-  const urlsUserCanAccess = geturlsForUserID(userID);
-  const shortURLID = req.params.id;
-  
- 
   if (!(shortURLID in urlsUserCanAccess)) {
     res.status(403).send(`${res.statusCode} error. You are not authorized to access this resource`);
   } else {
@@ -280,7 +276,6 @@ app.get("/urls/:id", (req, res) => {
       longURL: urlsUserCanAccess[shortURLID].longURL,
       user: users[userID]
     };
-
     res.render("urls_show", templateVars);
   }
 });
