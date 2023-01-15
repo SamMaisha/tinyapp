@@ -1,5 +1,6 @@
 const express = require("express"); // import express library
 const cookieParser = require('cookie-parser'); // import cookie parser
+const bcrypt = require("bcryptjs");
 
 const app = express(); // set up server using express
 const PORT = 8080; // deault port 8080
@@ -104,12 +105,14 @@ app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const userEmail = req.body.email;
   const userPassword = req.body.password;
+  const hashedPassword = bcrypt.hashSync(userPassword,10);
 
+  // if email or password fields are empty, send error message
   if (!userEmail || !userPassword) {
     return res.status(400).send(`${res.statusCode} error. Please enter valid email and password`)
   }
 
-  //check to see if user with email already exists
+  //send message if user with the email entered already exists
   const foundUser = getUserByEmail(userEmail);
 
   if (foundUser) { 
@@ -120,7 +123,7 @@ app.post("/register", (req, res) => {
   users[userID] = {
     id: userID,
     email: userEmail,
-    password: userPassword
+    password: hashedPassword
   };
   
   res.cookie('user_id', userID);
@@ -152,6 +155,7 @@ app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const userFound = getUserByEmail(userEmail);
+  const userID = userFound.id
 
   // if user's email does not exist in users object, send 403 status code
   if (!userFound) {
@@ -159,11 +163,10 @@ app.post("/login", (req, res) => {
   }
 
   // if user's password does not match password in users object, send 403 status code
-  if (userPassword !== userFound.password) {
+  if (!bcrypt.compareSync(userPassword,userFound.password)) {
     return res.status(403).send(`${res.statusCode} error. The password entered is incorrect.`)
   }
 
-  const userID = userFound.id
   res.cookie('user_id', userID);
   res.redirect("/urls");
 });
