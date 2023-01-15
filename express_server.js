@@ -287,7 +287,7 @@ app.post("/urls/:id", (req, res) => {
 
   // send error message if the shortUrlID does not exist
   if (!(shortURLID in urlDatabase)) {
-    res.status(404).send(`${res.statusCode} error.The url you are trying to update does not exist`)
+    res.status(404).send(`${res.statusCode} error.The url you are trying to update does not exist`);
   }
 
   urlDatabase[shortURLID] = {
@@ -299,7 +299,13 @@ app.post("/urls/:id", (req, res) => {
 
 // POST route to remove a deleted URL
 app.post("/urls/:id/delete", (req, res) => {
-  const shortURLId = req.params.id;
+  const shortURLID = req.params.id;
+
+  // send error message if the shortUrlID does not exist
+  if (!(shortURLID in urlDatabase)) {
+    res.status(404).send(`${res.statusCode} error.The url you are trying to delete does not exist`);
+  }
+
   delete urlDatabase[shortURLId];
 
   res.redirect("/urls");
