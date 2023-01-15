@@ -13,7 +13,7 @@ app.set("view engine", "ejs");
 
 // DATA
 // urls
-let urlDatabase = {
+const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
     userID: "h67f5h"
@@ -25,7 +25,7 @@ let urlDatabase = {
 };
 
 // users
-let users = {
+const users = {
   "h67f5h": {
     id: "h67f5h",
     email: "jade@gmail.com",
@@ -52,6 +52,17 @@ const getUserByEmail = function(email) {
   }
   return null;
 };
+
+const geturlsForUserID = function(userID) {
+  const urlIDArray = []; // empty array to take in list of short url IDs
+
+  for (const urlID in urlDatabase) {
+    if (urlDatabase[urlID].userID === userID) {
+      urlIDArray.push(urlID);
+    } 
+  }
+  return urlIDArray;
+}
 
 
 ////////////////////////////////////////////////////////// 
@@ -174,11 +185,16 @@ app.post("/logout", (req, res) => {
 
 // GET route
 app.get("/urls", (req, res) => {
+   // user cannot access /urls if not logged in
+  if (!req.cookies["user_id"]) {
+    res.status(401).send(`${res.statusCode} error. Cannot access resource. Please register or login`); 
+  }
 
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]]
   };
+
   res.render("urls_index", templateVars);
 });
 
