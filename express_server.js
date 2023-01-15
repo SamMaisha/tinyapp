@@ -106,6 +106,7 @@ app.post("/register", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const hashedPassword = bcrypt.hashSync(userPassword,10);
+  const foundUser = getUserByEmail(userEmail);
 
   // if email or password fields are empty, send error message
   if (!userEmail || !userPassword) {
@@ -113,7 +114,6 @@ app.post("/register", (req, res) => {
   }
 
   //send message if user with the email entered already exists
-  const foundUser = getUserByEmail(userEmail);
 
   if (foundUser) { 
      return res.status(400).send(`${res.statusCode} error. User with email ${userEmail} already exists`);
@@ -125,7 +125,7 @@ app.post("/register", (req, res) => {
     email: userEmail,
     password: hashedPassword
   };
-  
+
   res.cookie('user_id', userID);
   res.redirect ("/urls");
 });
@@ -155,7 +155,7 @@ app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const userFound = getUserByEmail(userEmail);
-  const userID = userFound.id
+  const userID = userFound.id;
 
   // if user's email does not exist in users object, send 403 status code
   if (!userFound) {
@@ -167,6 +167,7 @@ app.post("/login", (req, res) => {
     return res.status(403).send(`${res.statusCode} error. The password entered is incorrect.`)
   }
 
+  // if email and password are correct, save cookie to browser and redirect to /urls page
   res.cookie('user_id', userID);
   res.redirect("/urls");
 });
@@ -190,18 +191,18 @@ app.post("/logout", (req, res) => {
 
 // GET route
 app.get("/urls", (req, res) => {
+  const userID = req.cookies["user_id"];
+  const urlsUserCanAccess = geturlsForUserID(userID);
+
    // user cannot access /urls if not logged in
-  if (!req.cookies["user_id"]) {
+  if (!userID) {
     res.status(401).send(`${res.statusCode} error. Please login or register to access this resource`); 
   }
 
   // user can only see urls they created
-  const userID = req.cookies["user_id"]
-  const urlsUserCanAccess = geturlsForUserID(userID);
-
   const templateVars = {
     urls: urlsUserCanAccess,
-    user: users[req.cookies["user_id"]]
+    user: users[userID]
   };
 
   res.render("urls_index", templateVars);
@@ -214,29 +215,31 @@ app.get("/urls", (req, res) => {
 
 // GET route
 app.get("/urls/new", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies["user_id"]]
-  };
+  const userID = req.cookies["user_id"]
 
   // if user is not logged in, redirect to /login
-  if (!req.cookies["user_id"]) {
+  if (!userID) {
     res.redirect("/login");
   }
+
   // if user is logged in, they can access /urls/new page
-  res.render("urls_new", templateVars);
+  const templateVars = {
+    user: users[userID]
+  };
+
+  res.render("urls_new", templateVars);    
 });
 
 // POST route
 app.post("/urls", (req, res) => {
-
-  // if user is not logged in, they cannot create shortURL
-  if (!req.cookies["user_id"]) {
-    res.status(401).send(`${res.statusCode} error. Please login to submit URL`);
-  } else {
   const longURLNew = req.body.longURL;
   const shortURLId = generateRandomString();
-  const userID = req.cookies["user_id"]
-  
+  const userID = req.cookies["user_id"];
+
+  // if user is not logged in, they cannot create shortURL
+  if (!userID) {
+    res.status(401).send(`${res.statusCode} error. Please login to submit URL`);
+  } else {
   urlDatabase[shortURLId] = {
     longURL: longURLNew,
     userID
@@ -245,7 +248,6 @@ app.post("/urls", (req, res) => {
     
   res.redirect(`/urls/${shortURLId}`);
   }
-  console.log(urlDatabase);  
 });
 
 
