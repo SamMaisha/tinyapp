@@ -317,11 +317,14 @@ app.post("/urls/:id/delete", (req, res) => {
   // send error message if the user is not logged in
   if (!req.cookies["user_id"]) {
     res.status(401).send(`${res.statusCode} error. Please login or register to delete this resource`);
-  } 
+  } else {
+    delete urlDatabase[shortURLId];
 
-  delete urlDatabase[shortURLId];
+    res.redirect("/urls");
 
-  res.redirect("/urls");
+  }
+
+console.log(urlDatabase);
 });
 
 // GET route to redirect user to the longURL site
