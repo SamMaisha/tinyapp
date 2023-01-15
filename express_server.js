@@ -13,7 +13,7 @@ app.set("view engine", "ejs");
 
 // DATA
 // urls
-const urlDatabase = {
+let urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
     userID: "h67f5h"
@@ -25,9 +25,9 @@ const urlDatabase = {
 };
 
 // users
-const users = {
+let users = {
   "h67f5h": {
-    id: h67f5h,
+    id: "h67f5h",
     email: "jade@gmail.com",
     password: "123"
   },
@@ -210,8 +210,11 @@ app.post("/urls", (req, res) => {
   } else {
   const longURLNew = req.body.longURL;
   const shortURLId = generateRandomString();
-  urlDatabase[shortURLId] = longURLNew;
-
+  urlDatabase[shortURLId] = {
+    longURL: longURLNew,
+    }
+  console.log(urlDatabase);
+    
   res.redirect(`/urls/${shortURLId}`);
   }
   console.log(urlDatabase);  
@@ -231,7 +234,7 @@ app.get("/urls/:id", (req, res) => {
  
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: users[req.cookies["user_id"]]
   };
 
