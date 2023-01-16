@@ -60,10 +60,10 @@ const generateRandomString = function() {
   return Math.random().toString(36).slice(2);
 };
 
-const getUserByEmail = function(email) {
-  for (const userID in users) {
-    if ( users[userID].email === email ) {
-      return users[userID];
+const getUserByEmail = function(email, database) {
+  for (const userID in database) {
+    if ( database[userID].email === email ) {
+      return database[userID];
     }
   }
   return null;
@@ -122,7 +122,7 @@ app.post("/register", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const hashedPassword = bcrypt.hashSync(userPassword,10);
-  const foundUser = getUserByEmail(userEmail);
+  const foundUser = getUserByEmail(userEmail, users);
 
   // if email or password fields are empty, send error message
   if (!userEmail || !userPassword) {
@@ -171,7 +171,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
-  const userFound = getUserByEmail(userEmail);
+  const userFound = getUserByEmail(userEmail, users);
 
   // if user's email does not exist in users object, send 403 status code
   if (!userFound) {
