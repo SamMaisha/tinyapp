@@ -1,7 +1,7 @@
 const express = require("express"); // import express library
 const cookieSession = require("cookie-session"); // import cookie session
-const bcrypt = require("bcryptjs");
-const { getUserByEmail, generateRandomString, getUrlsForUserID } = require('./helpers');
+const bcrypt = require("bcryptjs"); // import bycrypt to hash passwords
+const { getUserByEmail, generateRandomString, getUrlsForUserID } = require('./helpers'); // import helper functions
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Configuration
@@ -104,7 +104,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send(`${res.statusCode} error. Please enter valid email and password`)
   }
 
-  //send message if user with the email entered already exists
+  // if email entered already exists in users object, send error message
   if (foundUser) { 
      return res.status(400).send(`${res.statusCode} error. User with email ${userEmail} already exists`);
   }
@@ -116,6 +116,7 @@ app.post("/register", (req, res) => {
     password: hashedPassword
   };
 
+  // set session cookie and redirect to /urls
   req.session.user_id = userID;
   res.redirect ("/urls");
 });
@@ -133,7 +134,7 @@ app.get("/login", (req, res) => {
     user: users[userID]
   };
   
-  // check if user is logged in. If they are, redirect to /urls 
+  // if user is logged in, redirect to /urls 
   if (userID ) {
     res.redirect("/urls");
   }
@@ -148,17 +149,17 @@ app.post("/login", (req, res) => {
   const userPassword = req.body.password;
   const userFound = getUserByEmail(userEmail, users);
 
-  // if user's email does not exist in users object, send 403 status code
+  // if user's email does not exist in users object, send error message
   if (!userFound) {
     return res.status(403).send(`${res.statusCode} error. User with email ${userEmail} cannot be found.`)
   }
 
-  // if user's password does not match password in users object, send 403 status code
+  // if user's password does not match password in users object, send error message
   if (!bcrypt.compareSync(userPassword,userFound.password)) {
     return res.status(403).send(`${res.statusCode} error. The password entered is incorrect.`)
   }
 
-  // if email and password are correct, save cookie to browser and redirect to /urls page
+  // if email and password are correct, set session cookie and redirect to /urls page
   const userID = userFound.id;
   req.session.user_id = userID;
   res.redirect("/urls");
@@ -246,10 +247,6 @@ app.post("/urls", (req, res) => {
 /** 
  * Additional Pages
  */
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
 
 // GET route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
@@ -340,19 +337,16 @@ app.post("/urls/:id/delete", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const shortURLID = req.params.id;
 
-  //user requests short URL with a non-existant id
+  // if user requests short URL with a non-existant id, send error message
   if (!(shortURLID in urlDatabase)) {
     res.status(404).send(`${res.statusCode} error URL not found. Please enter valid URL id`);
   } else {
-    // redirect client to site
+    // redirect user to site
   const longURL = urlDatabase[shortURLID].longURL;
   res.redirect(longURL);
   }
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
