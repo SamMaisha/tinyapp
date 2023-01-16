@@ -138,7 +138,7 @@ app.post("/register", (req, res) => {
     password: hashedPassword
   };
 
-  res.cookie('user_id', userID);
+  req.session.user_id = userID;
   res.redirect ("/urls");
 });
 
@@ -180,7 +180,7 @@ app.post("/login", (req, res) => {
 
   // if email and password are correct, save cookie to browser and redirect to /urls page
   const userID = userFound.id;
-  res.cookie('user_id', userID);
+  req.session.user_id = userID;
   res.redirect("/urls");
 });
 
