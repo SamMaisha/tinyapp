@@ -1,16 +1,17 @@
 const express = require("express"); // import express library
-const cookieSession = require('cookie-session'); // import cookie session
+const cookieSession = require("cookie-session"); // import cookie session
 const bcrypt = require("bcryptjs");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Configuration
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+
 const app = express(); // set up server using express
 const PORT = 8080; // deault port 8080
 
 const cookieSessionConfig = cookieSession({
   name:'session',
-  keys: ['secretKey1', 'secretKey2']
+  keys: ['secretKey1']
 })
 
 // configure view engine
@@ -100,12 +101,14 @@ app.get("/", (req, res) => {
 
 // GET route 
 app.get("/register", (req, res) => {
+  const userID = req.session.user_id;
+
   const templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[userID]
   };
   
    // check if user is logged in. If they are, redirect to /urls 
-   if (req.cookies["user_id"]) {
+   if (userID) {
     res.redirect("/urls");
   }
 
@@ -149,12 +152,14 @@ app.post("/register", (req, res) => {
 
 // GET route 
 app.get("/login", (req, res) => {
+  const userID = req.session.user_id;
+
   const templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[userID]
   };
   
   // check if user is logged in. If they are, redirect to /urls 
-  if (req.cookies["user_id"] ) {
+  if (userID ) {
     res.redirect("/urls");
   }
 
@@ -191,8 +196,10 @@ app.post("/login", (req, res) => {
 
 // POST route
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  // clear user's cookie
+  req.session = null;
 
+  // redirect to login page
   res.redirect("/login");
 });
 
@@ -203,7 +210,7 @@ app.post("/logout", (req, res) => {
 
 // GET route
 app.get("/urls", (req, res) => {
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const urlsUserCanAccess = geturlsForUserID(userID);
 
    // user cannot access /urls if not logged in
@@ -227,7 +234,7 @@ app.get("/urls", (req, res) => {
 
 // GET route
 app.get("/urls/new", (req, res) => {
-  const userID = req.cookies["user_id"]
+  const userID = req.session.user_id
 
   // if user is not logged in, redirect to /login
   if (!userID) {
@@ -245,18 +252,18 @@ app.get("/urls/new", (req, res) => {
 // POST route
 app.post("/urls", (req, res) => {
   const longURLNew = req.body.longURL;
-  const shortURLId = generateRandomString();
-  const userID = req.cookies["user_id"];
+  const shortURLID = generateRandomString();
+  const userID = req.session.user_id;
 
   // if user is not logged in, they cannot create shortURL
   if (!userID) {
     res.status(401).send(`${res.statusCode} error. Please login to submit URL`);
   } else {
-  urlDatabase[shortURLId] = {
+  urlDatabase[shortURLID] = {
     longURL: longURLNew,
     userID
     }
-  res.redirect(`/urls/${shortURLId}`);
+  res.redirect(`/urls/${shortURLID}`);
   }
 });
 
@@ -271,7 +278,7 @@ app.get("/urls.json", (req, res) => {
 
 // GET route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const urlsUserCanAccess = geturlsForUserID(userID);
   const shortURLID = req.params.id;
 
@@ -297,7 +304,7 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const shortURLID = req.params.id;
   const longURLUpdate = req.body.longURL;
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const urlsUserCanAccess = geturlsForUserID(userID);
 
   // send error message if the shortUrlID does not exist
@@ -316,6 +323,7 @@ app.post("/urls/:id", (req, res) => {
   } else {
     urlDatabase[shortURLID] = {
       longURL: longURLUpdate,
+      userID
     }
     res.redirect("/urls");
   } 
@@ -325,7 +333,7 @@ app.post("/urls/:id", (req, res) => {
 // POST route to remove a deleted URL
 app.post("/urls/:id/delete", (req, res) => {
   const shortURLID = req.params.id;
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const urlsUserCanAccess = geturlsForUserID(userID);
 
   // send error message if the shortUrlID does not exist
@@ -342,7 +350,7 @@ app.post("/urls/:id/delete", (req, res) => {
   if (!(shortURLID in urlsUserCanAccess)) {
     res.status(403).send(`${res.statusCode} error. Insufficient permission to delete this resource`)
   } else {
-    delete urlDatabase[shortURLId];
+    delete urlDatabase[shortURLID];
 
     res.redirect("/urls");
   }
