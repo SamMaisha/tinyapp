@@ -1,7 +1,7 @@
 const express = require("express"); // import express library
 const cookieSession = require("cookie-session"); // import cookie session
 const bcrypt = require("bcryptjs");
-const {getUserByEmail} = require('./helpers');
+const { getUserByEmail, generateRandomString, getUrlsForUserID } = require('./helpers');
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Configuration
@@ -56,24 +56,6 @@ const users = {
   },
 };
 
-// helper functions
-const generateRandomString = function() {
-  return Math.random().toString(36).slice(2);
-};
-
-
-const geturlsForUserID = function(userID) {
-  const urlObj = {}; // empty object to take in list of short url IDs and longURLs
-
-  for (const urlID in urlDatabase) {
-    if (urlDatabase[urlID].userID === userID) {
-      urlObj[urlID] = {
-        longURL: urlDatabase[urlID].longURL,
-      }
-    } 
-  } 
-  return urlObj; 
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Routes
@@ -204,7 +186,7 @@ app.post("/logout", (req, res) => {
 // GET route
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
-  const urlsUserCanAccess = geturlsForUserID(userID);
+  const urlsUserCanAccess = getUrlsForUserID(userID, urlDatabase);
 
    // user cannot access /urls if not logged in
   if (!userID) {
@@ -272,7 +254,7 @@ app.get("/urls.json", (req, res) => {
 // GET route to provide information about a single url
 app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
-  const urlsUserCanAccess = geturlsForUserID(userID);
+  const urlsUserCanAccess = getUrlsForUserID(userID, urlDatabase);
   const shortURLID = req.params.id;
 
   // if user is not logged in, they cannot access /urls/:id 
@@ -298,7 +280,7 @@ app.post("/urls/:id", (req, res) => {
   const shortURLID = req.params.id;
   const longURLUpdate = req.body.longURL;
   const userID = req.session.user_id;
-  const urlsUserCanAccess = geturlsForUserID(userID);
+  const urlsUserCanAccess = getUrlsForUserID(userID, urlDatabase);
 
   // send error message if the shortUrlID does not exist
   if (!(shortURLID in urlDatabase)) {
@@ -327,7 +309,7 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const shortURLID = req.params.id;
   const userID = req.session.user_id;
-  const urlsUserCanAccess = geturlsForUserID(userID);
+  const urlsUserCanAccess = getUrlsForUserID(userID, urlDatabase);
 
   // send error message if the shortUrlID does not exist
   if (!(shortURLID in urlDatabase)) {
