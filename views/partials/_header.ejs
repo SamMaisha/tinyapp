@@ -14,7 +14,8 @@
 
     <div class="navbar-nav">
       <% if (user) { %>
-        <span> Logged in as: <%= user.email %> </span> 
+        <span class="navbar-text px-3" style="color: #000000"> Logged in as: <%= user.email %> </span> 
+    
         <form method="POST" action="/logout">
           <button type="submit" class="btn btn-outline-dark">Logout</button>
         </form>
