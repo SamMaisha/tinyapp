@@ -257,6 +257,11 @@ app.get("/urls/:id", (req, res) => {
   const urlsUserCanAccess = getUrlsForUserID(userID, urlDatabase);
   const shortURLID = req.params.id;
 
+  // send error message if the shortUrlID does not exist
+  if (!(shortURLID in urlDatabase)) {
+    res.status(404).send(`${res.statusCode} error. The url you are trying to access does not exist`);
+  }
+
   // if user is not logged in, they cannot access /urls/:id 
   if (!userID) {
     res.status(401).send(`${res.statusCode} error. Please login or register to access this resource`);
@@ -284,7 +289,7 @@ app.post("/urls/:id", (req, res) => {
 
   // send error message if the shortUrlID does not exist
   if (!(shortURLID in urlDatabase)) {
-    res.status(404).send(`${res.statusCode} error.The url you are trying to update does not exist`);
+    res.status(404).send(`${res.statusCode} error. The url you are trying to update does not exist`);
   }
 
   // send error message if the user is not logged in
@@ -334,15 +339,15 @@ app.post("/urls/:id/delete", (req, res) => {
 // GET route to redirect user to the longURL site
 app.get("/u/:id", (req, res) => {
   const shortURLID = req.params.id;
-  const longURL = urlDatabase[shortURLID].longURL;
 
   //user requests short URL with a non-existant id
-  if (!longURL) {
-    return res.status(404).send(`${res.statusCode} error URL not found. Please enter valid URL id`);
-  }
-
-  // redirect client to site
+  if (!(shortURLID in urlDatabase)) {
+    res.status(404).send(`${res.statusCode} error URL not found. Please enter valid URL id`);
+  } else {
+    // redirect client to site
+  const longURL = urlDatabase[shortURLID].longURL;
   res.redirect(longURL);
+  }
 });
 
 app.get("/hello", (req, res) => {
