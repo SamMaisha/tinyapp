@@ -1,6 +1,7 @@
 const express = require("express"); // import express library
 const cookieSession = require("cookie-session"); // import cookie session
 const bcrypt = require("bcryptjs");
+const {getUserByEmail} = require('./helpers');
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Configuration
@@ -60,14 +61,6 @@ const generateRandomString = function() {
   return Math.random().toString(36).slice(2);
 };
 
-const getUserByEmail = function(email, database) {
-  for (const userID in database) {
-    if ( database[userID].email === email ) {
-      return database[userID];
-    }
-  }
-  return null;
-};
 
 const geturlsForUserID = function(userID) {
   const urlObj = {}; // empty object to take in list of short url IDs and longURLs
