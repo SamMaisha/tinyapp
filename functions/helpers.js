@@ -1,7 +1,7 @@
 // function to return a user object when an email exists in the database; else provide null
 const getUserByEmail = function(email, database) {
   for (const userID in database) {
-    if ( database[userID].email === email ) {
+    if (database[userID].email === email) {
       return database[userID];
     }
   }
@@ -16,18 +16,15 @@ const getUrlsForUserID = function(userID, database) {
     if (database[urlID].userID === userID) {
       urlObj[urlID] = {
         longURL: database[urlID].longURL,
-      }
-    } 
-  } 
-  return urlObj; 
-}
-
+      };
+    }
+  }
+  return urlObj;
+};
 
 // function to generate an identifier
 const generateRandomString = function() {
   return Math.random().toString(36).slice(2);
 };
 
-
-
-module.exports = { getUserByEmail, generateRandomString, getUrlsForUserID }
+module.exports = { getUserByEmail, generateRandomString, getUrlsForUserID };
