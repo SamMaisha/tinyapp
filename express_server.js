@@ -37,10 +37,11 @@ app.use(express.urlencoded({ extended: true })); // parse request body
 
 app.get("/", (req, res) => {
   const userID = req.session.user_id;
-   // check if user is not logged in - if not, redirect to /login
+   // if user is not logged in, redirect to /login
    if (!userID) {
     res.redirect("/login");
   } else {
+    // if user is logged in redirect to /urls
     res.redirect("/urls");
   }
 });
@@ -55,12 +56,14 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user: users[userID]
   }; 
-   // check if user is logged in. If they are, redirect to /urls 
+   // if user is logged in, redirect to /urls 
    if (userID) {
     res.redirect("/urls");
-  }
+  } else {
   // if user is not logged in, they can access registration page
   res.render("register", templateVars);
+  }
+  
 });
 
 // POST route 
@@ -78,7 +81,7 @@ app.post("/register", (req, res) => {
   if (foundUser) { 
      return res.status(400).send(`${res.statusCode} error. User with email ${userEmail} already exists`);
   }
-  // if user with email does not exist, add user to users object
+  // if user with email/password valid and email does not exist, add user to users object
   users[userID] = {
     id: userID,
     email: userEmail,
@@ -103,9 +106,11 @@ app.get("/login", (req, res) => {
   // if user is logged in, redirect to /urls 
   if (userID ) {
     res.redirect("/urls");
-  }
-  // if user is not logged in, they can access login page
+  } else {
+    // if user is not logged in, they can access login page
   res.render("login", templateVars);
+  }
+  
 });
 
 // POST route 
@@ -151,7 +156,7 @@ app.get("/urls", (req, res) => {
   const urlsUserCanAccess = getUrlsForUserID(userID, urlDatabase);
    // user cannot access /urls if not logged in
   if (!userID) {
-    res.status(401).send(`${res.statusCode} error. Please login or register to access this resource`); 
+    return res.status(401).send(`${res.statusCode} error. Please login or register to access this resource`); 
   }
   // user can only see urls they created
   const templateVars = {
@@ -172,12 +177,13 @@ app.get("/urls/new", (req, res) => {
   // if user is not logged in, redirect to /login
   if (!userID) {
     res.redirect("/login");
-  }
-  // if user is logged in, they can access /urls/new page
+  } else {
+    // if user is logged in, they can access /urls/new page
   const templateVars = {
     user: users[userID]
   };
-  res.render("urls_new", templateVars);    
+  res.render("urls_new", templateVars); 
+  }     
 });
 
 // POST route
@@ -187,8 +193,9 @@ app.post("/urls", (req, res) => {
   const userID = req.session.user_id;
   // if user is not logged in, they cannot create shortURL
   if (!userID) {
-    res.status(401).send(`${res.statusCode} error. Please login to submit URL`);
+    return res.status(401).send(`${res.statusCode} error. Please login to submit URL`);
   } else {
+  // shortURL is added to to urlDatabase; user is redirected
   urlDatabase[shortURLID] = {
     longURL: longURLNew,
     userID
@@ -209,16 +216,17 @@ app.get("/urls/:id", (req, res) => {
   const shortURLID = req.params.id;
   // send error message if the shortUrlID does not exist
   if (!(shortURLID in urlDatabase)) {
-    res.status(404).send(`${res.statusCode} error. The url you are trying to access does not exist`);
+    return res.status(404).send(`${res.statusCode} error. The url you are trying to access does not exist`);
   }
   // if user is not logged in, they cannot access /urls/:id 
   if (!userID) {
-    res.status(401).send(`${res.statusCode} error. Please login or register to access this resource`);
+    return res.status(401).send(`${res.statusCode} error. Please login or register to access this resource`);
   } 
   // users can only access urls they created
   if (!(shortURLID in urlsUserCanAccess)) {
-    res.status(403).send(`${res.statusCode} error. You are not authorized to access this resource`);
+    return res.status(403).send(`${res.statusCode} error. You are not authorized to access this resource`);
   } else {
+    // user can get access to urls/:id page  
     const templateVars = {
       id: shortURLID,
       longURL: urlsUserCanAccess[shortURLID].longURL,
@@ -236,15 +244,15 @@ app.post("/urls/:id", (req, res) => {
   const urlsUserCanAccess = getUrlsForUserID(userID, urlDatabase);
   // send error message if the shortUrlID does not exist
   if (!(shortURLID in urlDatabase)) {
-    res.status(404).send(`${res.statusCode} error. The url you are trying to update does not exist`);
+    return res.status(404).send(`${res.statusCode} error. The url you are trying to update does not exist`);
   }
   // send error message if the user is not logged in
   if (!userID) {
-    res.status(401).send(`${res.statusCode} error. Please login or register to update this resource`);
+    return res.status(401).send(`${res.statusCode} error. Please login or register to update this resource`);
   }   
   // user cannot update urls they did not create
   if (!(shortURLID in urlsUserCanAccess)) {
-    res.status(403).send(`${res.statusCode} error. Insufficient permission to update this resource`)
+    return res.status(403).send(`${res.statusCode} error. Insufficient permission to update this resource`)
   } else {
     urlDatabase[shortURLID] = {
       longURL: longURLUpdate,
@@ -262,15 +270,15 @@ app.post("/urls/:id/delete", (req, res) => {
   const urlsUserCanAccess = getUrlsForUserID(userID, urlDatabase);
   // send error message if the shortUrlID does not exist
   if (!(shortURLID in urlDatabase)) {
-    res.status(404).send(`${res.statusCode} error.The url you are trying to delete does not exist`);
+    return res.status(404).send(`${res.statusCode} error.The url you are trying to delete does not exist`);
   }
   // send error message if the user is not logged in
   if (!userID) {
-    res.status(401).send(`${res.statusCode} error. Please login or register to delete this resource`);
+    return res.status(401).send(`${res.statusCode} error. Please login or register to delete this resource`);
   }   
   // user cannot delete urls they did not create
   if (!(shortURLID in urlsUserCanAccess)) {
-    res.status(403).send(`${res.statusCode} error. Insufficient permission to delete this resource`)
+    return res.status(403).send(`${res.statusCode} error. Insufficient permission to delete this resource`)
   } else {
     delete urlDatabase[shortURLID];
     res.redirect("/urls");
@@ -282,14 +290,13 @@ app.get("/u/:id", (req, res) => {
   const shortURLID = req.params.id;
   // if user requests short URL with a non-existant id, send error message
   if (!(shortURLID in urlDatabase)) {
-    res.status(404).send(`${res.statusCode} error URL not found. Please enter valid URL id`);
+    return res.status(404).send(`${res.statusCode} error URL not found. Please enter valid URL id`);
   } else {
     // redirect user to site
   const longURL = urlDatabase[shortURLID].longURL;
   res.redirect(longURL);
   }
 });
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
