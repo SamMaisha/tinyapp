@@ -11,7 +11,7 @@ const urlDatabase = {
   "9sm5xK": {
     longURL: "http://www.google.com",
     userID: "h67f5h"
-  }, 
+  },
 };
 
 // Users
@@ -29,4 +29,4 @@ const users = {
   },
 };
 
-module.exports = { urlDatabase, users }
+module.exports = { urlDatabase, users };
