@@ -1,8 +1,8 @@
 const express = require("express"); // import express library
 const cookieSession = require("cookie-session"); // import cookie session
 const bcrypt = require("bcryptjs"); // import bycrypt to hash passwords
-const { getUserByEmail, generateRandomString, getUrlsForUserID } = require('./helpers'); // import helper functions
-const { urlDatabase, users } = require('./database'); // import database objects
+const { getUserByEmail, generateRandomString, getUrlsForUserID } = require('./functions/helpers'); // import helper functions
+const { urlDatabase, users } = require('./databases/database'); // import database objects
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Configuration
@@ -254,6 +254,7 @@ app.post("/urls/:id", (req, res) => {
   if (!(shortURLID in urlsUserCanAccess)) {
     return res.status(403).send(`${res.statusCode} error. Insufficient permission to update this resource`)
   } else {
+    // if user owns the URL resource, they can udpate it; redirect user to /urls
     urlDatabase[shortURLID] = {
       longURL: longURLUpdate,
       userID
@@ -280,6 +281,7 @@ app.post("/urls/:id/delete", (req, res) => {
   if (!(shortURLID in urlsUserCanAccess)) {
     return res.status(403).send(`${res.statusCode} error. Insufficient permission to delete this resource`)
   } else {
+    // if user owns URL resource, they can delete it. Redirect user to /urls
     delete urlDatabase[shortURLID];
     res.redirect("/urls");
   }
